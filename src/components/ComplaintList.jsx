@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatusIndicator from './StatusIndicator';
-import { API_BASE_URL, getCategoryLabel, COMPLAINT_STATUS } from '../constants';
+import { API_BASE_URL, getCategoryLabel, COMPLAINT_STATUS, normalizeComplaintStatus } from '../constants';
 
 const STATUS_ACTION_OPTIONS = [
   { value: COMPLAINT_STATUS.PENDING, label: 'Pending' },
   { value: COMPLAINT_STATUS.IN_PROGRESS, label: 'Fixing' },
   { value: COMPLAINT_STATUS.RESOLVED, label: 'Completed' },
+  { value: COMPLAINT_STATUS.REJECTED, label: 'Rejected' },
 ];
 
-export default function ComplaintList({ complaints, showUser = false, basePath = '/complaints', showActionColumn = false, onStatusChange, onRefresh }) {
+export default function ComplaintList({ complaints, showUser = false, basePath = '/complaints', showActionColumn = false, onStatusChange, onRefresh, onError }) {
   const [updatingId, setUpdatingId] = useState(null);
 
   const handleActionChange = async (complaintId, newStatus) => {
@@ -17,7 +18,10 @@ export default function ComplaintList({ complaints, showUser = false, basePath =
     setUpdatingId(complaintId);
     try {
       await onStatusChange(complaintId, newStatus);
+      onError?.('');
       onRefresh?.();
+    } catch (err) {
+      onError?.(err.response?.data?.message || 'Failed to update status.');
     } finally {
       setUpdatingId(null);
     }
@@ -98,7 +102,7 @@ export default function ComplaintList({ complaints, showUser = false, basePath =
                 <td>
                   <select
                     className="form-select form-select-sm"
-                    value={complaint.status}
+                    value={normalizeComplaintStatus(complaint.status)}
                     onChange={(e) => handleActionChange(complaint.id, e.target.value)}
                     disabled={updatingId === complaint.id}
                   >

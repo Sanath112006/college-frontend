@@ -18,7 +18,7 @@ A React.js frontend for the Digital Complaint Portal for Colleges. Students can 
 
 2. Configure the backend API URL (optional). By default the app uses Vite proxy to `/api` (see `vite.config.js`). Create a `.env` file to override:
    ```
-   VITE_API_URL=http://localhost:8080/api
+   VITE_API_URL=https://college-backend-yv77.onrender.com
    ```
 
 3. Start the dev server:

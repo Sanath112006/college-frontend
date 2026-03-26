@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../constants';
+import { API_BASE_URL, normalizeComplaintStatus } from '../constants';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -60,7 +60,8 @@ export const complaintAPI = {
 export const adminAPI = {
   getAllComplaints: (params) => api.get('/complaints', { params }),
   getComplaintById: (id) => api.get(`/complaints/${id}`),
-  updateStatus: (id, status) => api.patch(`/complaints/${id}/status`, { status }),
+  updateStatus: (id, status) =>
+    api.patch(`/complaints/${id}/status`, { status: normalizeComplaintStatus(status) }),
   respondToComplaint: (id, response) => api.post(`/complaints/${id}/responses`, { message: response }),
 };
 

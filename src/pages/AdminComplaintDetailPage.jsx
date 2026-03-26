@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminAPI } from '../services/api';
-import { API_BASE_URL, COMPLAINT_STATUS, getCategoryLabel, getLocationTypeLabel } from '../constants';
+import { API_BASE_URL, COMPLAINT_STATUS, getCategoryLabel, getLocationTypeLabel, normalizeComplaintStatus } from '../constants';
 import StatusIndicator from '../components/StatusIndicator';
 import AlertMessage from '../components/AlertMessage';
 
@@ -22,7 +22,7 @@ export default function AdminComplaintDetailPage() {
       .then((res) => {
         const complaintData = res.data?.data ?? res.data;
         setComplaint(complaintData);
-        setNewStatus(complaintData?.status);
+        setNewStatus(normalizeComplaintStatus(complaintData?.status));
       })
       .catch((err) => setError(err.response?.data?.message || 'Complaint not found.'))
       .finally(() => setLoading(false));
@@ -34,7 +34,8 @@ export default function AdminComplaintDetailPage() {
 
   const handleUpdateStatus = async (e) => {
     e.preventDefault();
-    if (!newStatus || newStatus === complaint?.status) return;
+    const currentStatusNormalized = normalizeComplaintStatus(complaint?.status);
+    if (!newStatus || newStatus === currentStatusNormalized) return;
     setUpdating(true);
     setError('');
     setSuccess('');
@@ -183,11 +184,12 @@ export default function AdminComplaintDetailPage() {
                   <option value={COMPLAINT_STATUS.PENDING}>Pending</option>
                   <option value={COMPLAINT_STATUS.IN_PROGRESS}>Fixing</option>
                   <option value={COMPLAINT_STATUS.RESOLVED}>Completed</option>
+                  <option value={COMPLAINT_STATUS.REJECTED}>Rejected</option>
                 </select>
                 <button
                   type="submit"
                   className="btn btn-primary btn-sm"
-                  disabled={updating || newStatus === complaint.status}
+                  disabled={updating || newStatus === normalizeComplaintStatus(complaint.status)}
                 >
                   {updating ? 'Updating...' : 'Update Status'}
                 </button>

@@ -30,6 +30,7 @@ export default function AdminDashboard() {
   };
 
   const handleStatusChange = async (complaintId, status) => {
+    setError('');
     await adminAPI.updateStatus(complaintId, status);
   };
 
@@ -69,6 +70,7 @@ export default function AdminDashboard() {
                 <option value={COMPLAINT_STATUS.PENDING}>Pending</option>
                 <option value={COMPLAINT_STATUS.IN_PROGRESS}>Fixing</option>
                 <option value={COMPLAINT_STATUS.RESOLVED}>Completed</option>
+                <option value={COMPLAINT_STATUS.REJECTED}>Rejected</option>
               </select>
             </div>
           </div>
@@ -87,6 +89,7 @@ export default function AdminDashboard() {
           showActionColumn
           onStatusChange={handleStatusChange}
           onRefresh={fetchComplaints}
+          onError={setError}
         />
       )}
     </div>
